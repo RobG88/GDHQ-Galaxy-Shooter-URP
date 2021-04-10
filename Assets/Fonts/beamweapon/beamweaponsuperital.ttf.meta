@@ -1,0 +1,22 @@
+fileFormatVersion: 2
+guid: 14b32ad2d5359de489e80e7ebe1953b4
+TrueTypeFontImporter:
+  externalObjects: {}
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontNames:
+  - Beam Weapon Super-Italic
+  fallbackFontReferences:
+  - {fileID: 12800000, guid: f25d6c02c2c8ada4b93d10539fea6ced, type: 3}
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  useLegacyBoundsCalculation: 0
+  shouldRoundAdvanceValue: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

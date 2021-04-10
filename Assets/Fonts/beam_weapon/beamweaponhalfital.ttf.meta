@@ -1,0 +1,22 @@
+fileFormatVersion: 2
+guid: b8b665f350e0a7841ad648e8867eef30
+TrueTypeFontImporter:
+  externalObjects: {}
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontNames:
+  - Beam Weapon Halftone Italic
+  fallbackFontReferences:
+  - {fileID: 12800000, guid: 93bc86b148a5be740a5519f9ce8a3649, type: 3}
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  useLegacyBoundsCalculation: 0
+  shouldRoundAdvanceValue: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

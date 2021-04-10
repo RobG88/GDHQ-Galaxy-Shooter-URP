@@ -1,0 +1,23 @@
+fileFormatVersion: 2
+guid: 6e46aef01d17115409a134289322d2ef
+TrueTypeFontImporter:
+  externalObjects: {}
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontNames:
+  - Beam Weapon Condensed
+  fallbackFontReferences:
+  - {fileID: 12800000, guid: 34edc395a6feaa143bf79b5f895c60fd, type: 3}
+  - {fileID: 12800000, guid: 4c4d1d33e6c0b63439eba333d1bad2a5, type: 3}
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  useLegacyBoundsCalculation: 0
+  shouldRoundAdvanceValue: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

@@ -1,0 +1,23 @@
+fileFormatVersion: 2
+guid: 6a0bc5c45bc81f94cbbbf6671e8d287a
+TrueTypeFontImporter:
+  externalObjects: {}
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontNames:
+  - Beam Weapon Gradient Italic
+  fallbackFontReferences:
+  - {fileID: 12800000, guid: 5812c7100cdbf934f90b515870d5d6b2, type: 3}
+  - {fileID: 12800000, guid: 66cc3257df6c2264782d94f1f79e7416, type: 3}
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  useLegacyBoundsCalculation: 0
+  shouldRoundAdvanceValue: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

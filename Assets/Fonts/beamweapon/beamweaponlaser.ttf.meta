@@ -1,0 +1,23 @@
+fileFormatVersion: 2
+guid: ad9e839f8193fe847b7c6987b1890715
+TrueTypeFontImporter:
+  externalObjects: {}
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontNames:
+  - Beam Weapon Laser
+  fallbackFontReferences:
+  - {fileID: 12800000, guid: 8c56dbb22dc749c4ea95400109b3cf37, type: 3}
+  - {fileID: 12800000, guid: 8c83edb6b73f1854faa9b567021e507f, type: 3}
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  useLegacyBoundsCalculation: 0
+  shouldRoundAdvanceValue: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

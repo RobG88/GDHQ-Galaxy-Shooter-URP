@@ -1,0 +1,23 @@
+fileFormatVersion: 2
+guid: f425337c2d7349249bb4239cfb59cded
+TrueTypeFontImporter:
+  externalObjects: {}
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontNames:
+  - Beam Weapon 3D
+  fallbackFontReferences:
+  - {fileID: 12800000, guid: b322496f53eab9a4ba4c0ceeb2e71fc9, type: 3}
+  - {fileID: 12800000, guid: 40efca1f96c1867498fd978f4cd9e005, type: 3}
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  useLegacyBoundsCalculation: 0
+  shouldRoundAdvanceValue: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
