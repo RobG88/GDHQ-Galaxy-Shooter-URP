@@ -30,7 +30,11 @@ public class Laser : MonoBehaviour
     {
         if (other.CompareTag("Enemy")) // || other.CompareTag("Asteroid"))
         {
-            Destroy(gameObject);
+            if (transform.parent != null)
+            {
+                Destroy(transform.parent.gameObject);
+            }
+            else { Destroy(gameObject); }
         }
     }
 }

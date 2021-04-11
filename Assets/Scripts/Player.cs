@@ -6,10 +6,15 @@ public class Player : MonoBehaviour
 {
     public static Player instance;
 
-    [SerializeField] int _lives = 3;
+    [SerializeField] int _playerLives = 3;
+    [SerializeField] float _speed; // player/ship movement speed
+    [SerializeField] float _spaceshipSpeed = 15.0f;  // player/ship BASE CONSTANT speed
+                                                     // speed lost for damage
+
+    bool _enableMainThrusters;
 
     bool isGameOver = false;
-    [SerializeField] float _speed = 15f;
+
     [SerializeField] float _fireRate = 0.15f;  // delay (in Seconds) how quickly the laser will fire
     float _nextFire = -1.0f;  // game time value, tracking when player/ship can fire next laser
 
@@ -25,8 +30,20 @@ public class Player : MonoBehaviour
     float _yScreenClampUpper = 0;
     float _yScreenClampLower = -7f; // offical game = -3.8f;
 
-    bool _powerup_Tripleshot;
+    /// <summary>
+    /// PowerUp Variables
+    /// Tripleshot
+    [SerializeField] bool _powerUp_Tripleshot;
     [SerializeField] GameObject _tripleshotPrefab;
+
+    /// Speed
+    bool _speedActive = false;
+    /// Shield
+    /// LaserEnergy
+    /// Repair
+    /// Ultimate
+    /// </summary>
+
 
     // CHEAT KEYS
     //
@@ -43,12 +60,14 @@ public class Player : MonoBehaviour
 
     void Start()
     {
-        _lives = 3;
+        _playerLives = 3;
         isGameOver = false;
         transform.position = new Vector3(0, -7, 0); // offical game (0, -3.5f, 0);
         ////transform.position = new Vector3(0.3834784f, -5, 0); // exactly fire two lasers into one enemy
-        //UI.instance.DisplayLives(_lives);
-        //UI.instance.DisplayShipWrapStatus();
+        UI.instance.DisplayLives(_playerLives);
+        UI.instance.DisplayShipWrapStatus();
+
+        _speed = _spaceshipSpeed; // initialize Ship/Player speed
     }
 
     void Update()
@@ -56,8 +75,6 @@ public class Player : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Space) && Time.time > _nextFire)
         {
             FireLaser();
-            //anim.SetBool("fire", true);
-            ////anim.SetTrigger("isFiring");
         }
 
         // Cheat Keys:
@@ -67,15 +84,17 @@ public class Player : MonoBehaviour
         //
         // G = Enable GOD mode
         //
-        if (Input.GetKeyDown(KeyCode.Q)) { _wrapShip = !_wrapShip; }
-        //if (Input.GetKeyDown(KeyCode.Q)) { _wrapShip = !_wrapShip; UI.instance.SetCheatKey(_wrapShip); UI.instance.DisplayShipWrapStatus(); }
+        //if (Input.GetKeyDown(KeyCode.Q)) { _wrapShip = !_wrapShip; }
+        if (Input.GetKeyDown(KeyCode.Q)) { _wrapShip = !_wrapShip; UI.instance.SetCheatKey(_wrapShip); UI.instance.DisplayShipWrapStatus(); }
         if (Input.GetKeyDown(KeyCode.G)) { _cheat_GODMODE = !_cheat_GODMODE; }
-        if (Input.GetKeyDown(KeyCode.T)) { _cheat_TRIPLE = !_cheat_TRIPLE; _powerup_Tripleshot = _cheat_TRIPLE; }
+        if (Input.GetKeyDown(KeyCode.T)) { _cheat_TRIPLE = !_cheat_TRIPLE; _powerUp_Tripleshot = _cheat_TRIPLE; }
         CalculateMovement();
     }
 
     void CalculateMovement()
     {
+        _speed = CalculateShipSpeed();
+
         float horizontalInput = Input.GetAxis("Horizontal");
         float verticalInput = Input.GetAxis("Vertical");
         Vector3 direction = new Vector3(horizontalInput, verticalInput, 0);
@@ -109,12 +128,10 @@ public class Player : MonoBehaviour
     void FireLaser()
     {
         _nextFire = Time.time + _fireRate; // delay (in Seconds) how quickly the laser will fire
-        if (!_powerup_Tripleshot)
+        if (!_powerUp_Tripleshot)
         {
             GameObject laser1 = Instantiate(_laserPrefab, _gunLeft.position, Quaternion.identity);
-            //laser1.transform.parent = transform;
             GameObject laser2 = Instantiate(_laserPrefab, _gunRight.position, Quaternion.identity);
-            //laser2.transform.parent = transform;
         }
         else
         {
@@ -132,19 +149,20 @@ public class Player : MonoBehaviour
     {
         if (_cheat_GODMODE) return;
 
-        _lives--;
-        if (_lives == 0)
+        _playerLives--;
+        if (_playerLives == 0)
         {
             PlayerDeath();
         }
-        UI.instance.DisplayLives(_lives);
+
+        UI.instance.DisplayLives(_playerLives);
     }
 
     void PlayerDeath()
     {
+        GameManager.instance.OnPlayerDeath();
         isGameOver = true;
         UI.instance.GameOver(isGameOver);
-        //SpawnManager.instance.OnPlayerDeath();
         WaveSpawner.instance.OnPlayerDeath();
         Destroy(this.gameObject, 0.25f);
     }
@@ -156,22 +174,137 @@ public class Player : MonoBehaviour
             Damage();
         }
 
-        if (other.tag == "Powerup_Tripleshot")
+        if (other.tag == "PowerUp")
         {
-            //TripleshotActivate();
+            string PowerUpToActivate;
+            PowerUpToActivate = other.transform.GetComponent<PowerUp>().PowerType().ToString();
+            // TODO: Need to Handle Multiple PowerUps?
+            ActivatePowerUp(PowerUpToActivate);
         }
     }
 
-    public void TripleshotActivate()
+    public void Activate_PowerUp_Tripleshot()
     {
-        _powerup_Tripleshot = !_powerup_Tripleshot;
         StartCoroutine(ActivatePowerupTripleshot());
     }
 
     IEnumerator ActivatePowerupTripleshot()
     {
+        _powerUp_Tripleshot = true;
         yield return new WaitForSeconds(5f);
+        _powerUp_Tripleshot = false;
+    }
 
-        _powerup_Tripleshot = !_powerup_Tripleshot;
+    public void Activate_PowerUp_SpeedBoost()
+    {
+        StartCoroutine(ActivatePowerupSpeedBoost());
+    }
+
+    IEnumerator ActivatePowerupSpeedBoost()
+    {
+        _speedActive = true;
+        yield return new WaitForSeconds(5f);
+        _speedActive = false;
+    }
+
+    IEnumerator ActivePowerUp(int timer)
+    {
+        yield return new WaitForSeconds(timer);
+    }
+
+    void ActivatePowerUp(string _powerUpType) // PowerUp activations
+    {
+        //_timesUpText.text = _powerUpType;
+
+        switch (_powerUpType)
+        {
+            case "TripleShot":
+                Activate_PowerUp_Tripleshot();
+                /*
+                _tripleShotActive = true;
+                LaserCannonsRefill(15);
+                //_timesUpText.text = _powerUpType;
+                // Enable PowerUpCountDownBar
+                _powerUpCountDownBar.SetActive(true);
+                StartCoroutine(PowerUpCoolDownRoutine(_tripleShotCoolDown));
+                */
+                break;
+            case "Speed":
+                Activate_PowerUp_SpeedBoost();
+                /*
+                // Enable PowerUpCountDownBar
+                _powerUpCountDownBar.SetActive(true);
+                StartCoroutine(PowerUpCoolDownRoutine(_speedCoolDown));
+                */
+                break;
+                /*
+                    /// 
+                    /// SHIELD POWERUP
+                    /// 
+                    case "Shield":
+                        _shieldPower = 3; // # of hits before shield is destroyed
+                        _shield.transform.localScale = _shieldOriginalSize; // reset shield graphic to initial size
+                        _shieldActive = true;
+                        _shield.SetActive(true); // enable the Shield gameObject
+                        break;
+                    /// 
+                    /// SHIELD POWERUP - END
+                    /// 
+                    case "EnergyCell":
+                        LaserCannonsRefill(5);
+                        break;
+                    ///
+                    /// REPAIR 'Health' POWERUP
+                    /// 
+                    case "Repair":
+                        RepairShip();
+                        break;
+                    ///
+                    /// REPAIR 'Health' POWERUP - END
+                    /// 
+
+                    ///
+                    /// FREEZE/EMP TORPEDO POWERUP
+                    /// 
+                    case "FreezeTorpedo":
+                        _freezeTorpedoLoaded = true;
+                        _freezeTorpedoSprite.SetActive(true);
+                        break;
+                        ///
+                        /// FREEZE/EMP TORPEDO POWERUP - END
+                        ///
+                */
+        }
+    }
+
+    float CalculateShipSpeed() // Ship's speed = _spaceshipSpeed, calc PowerUp, damage 
+    {
+        var _newSpeed = _spaceshipSpeed;
+
+        if (_playerLives == 2)
+        {
+            _newSpeed = _spaceshipSpeed - 1;
+        }
+
+        if (_playerLives == 1)
+        {
+            _newSpeed = _spaceshipSpeed - 2;
+        }
+
+        if (_speedActive) // PowerUp = speed * 175%
+        {
+            _newSpeed = _spaceshipSpeed * 1.75f;
+        }
+        ///
+        /// THRUSTERS - SPEED CALC
+        /// 
+        if (_enableMainThrusters) // Thrusters = speed * 250%
+        {
+            _newSpeed = _spaceshipSpeed * 2.50f;
+        }
+        ///
+        /// THRUSTERS - SPEED CALC - END
+        /// 
+        return _newSpeed;
     }
 }

@@ -27,6 +27,15 @@ public class WaveSpawner : MonoBehaviour
     [SerializeField] float _waveCountdown;
     [SerializeField] GameObject _enemyContainer;
 
+    [SerializeField] GameObject[] _powerUpPrefabs;
+    [SerializeField] GameObject _powerUpContainer;
+    float _waitTimeBetweenPowerUpSpawns;
+    [SerializeField]float _spawnNextPowerup = -1.0f;  // game time value, tracking when a powerup can be spawned
+    float _spawnPowerRate; // random time between min & max;
+
+
+    float _delayAfterAsteroidDestroyed = 2.5f;
+
     bool _playerIsAlive = true;  // as long as playerIsAlive keep spawning current wave
     bool _beginCountdown = true;
 
@@ -80,6 +89,48 @@ public class WaveSpawner : MonoBehaviour
         }
     }
 
+    IEnumerator SpawnWave(Wave _wave)
+    {
+        _spawnState = SpawnState.SPAWNING;
+
+        //SpawnManager.instance.StopOldPowerUpSwawnRoutine(false);
+        //SpawnManager.instance.SpawnPowerup(true);
+        //StartCoroutine(SpawnManager.instance.SpawnPowerUpRoutine());
+        StartCoroutine("SpawnPowerUpRoutine");
+        /*
+        if (Time.time > _spawnNextPowerup)
+        {
+            int _RNDPowerUp = Random.Range(0, _powerUpPrefabs.Length);
+            GameObject newPowerUp = Instantiate(_powerUpPrefabs[_RNDPowerUp], new Vector3(Random.Range(-6, 6), Random.Range(12, 14), 0), Quaternion.identity);
+            newPowerUp.transform.parent = _powerUpContainer.transform;
+            _spawnPowerRate = Random.Range(4f, 9f);
+            _spawnNextPowerup = Time.time + _spawnPowerRate;
+        }
+        */
+        // Spawn enemies
+        for (int i = 0; i < _wave.enemyCount; i++)
+        {
+            _currentEnemies++;
+            SpawnEnemy(_wave.enemyPrefab);
+            UI.instance.DisplayEnemies(_currentEnemies, _wave.enemyCount);
+            // yield return new WaitForSeconds(1f / _wave.spawnRate);
+            yield return new WaitForSeconds(_wave.delayBetweenEnemySpawns);
+
+            if (!_playerIsAlive) { yield break; }
+        }
+
+        _spawnState = SpawnState.WAITING;
+
+        yield break;
+    }
+
+    void SpawnEnemy(GameObject _enemyPrefab)
+    {
+        Debug.Log("Spawning Enemy: " + _enemyPrefab.name);
+        GameObject newEnemy = Instantiate(_enemyPrefab, new Vector3(0, 10, 0), Quaternion.identity);
+        newEnemy.transform.parent = _enemyContainer.transform;
+    }
+
     void WaveCompleted()
     {
         // Begin a new Wave
@@ -89,6 +140,10 @@ public class WaveSpawner : MonoBehaviour
         // Depending on performance a bonus
         Debug.Log("All Enemies Destroyed --- Wave Completed!");
 
+        //SpawnManager.instance.SpawnPowerup(false);
+        //SpawnManager.instance.StopOldPowerUpSwawnRoutine(true);
+        //StopCoroutine(SpawnManager.instance.SpawnPowerUpRoutine());
+        StopCoroutine("SpawnPowerUpRoutine");
         _spawnState = SpawnState.COUNTING;
         _waveCountdown = _timeBetweenWaves;
         _currentEnemies = 0;
@@ -115,33 +170,6 @@ public class WaveSpawner : MonoBehaviour
         return;
     }
 
-    IEnumerator SpawnWave(Wave _wave)
-    {
-        _spawnState = SpawnState.SPAWNING;
-
-        // Spawn enemies
-        for (int i = 0; i < _wave.enemyCount; i++)
-        {
-            _currentEnemies++;
-            SpawnEnemy(_wave.enemyPrefab);
-            UI.instance.DisplayEnemies(_currentEnemies, _wave.enemyCount);
-            // yield return new WaitForSeconds(1f / _wave.spawnRate);
-            yield return new WaitForSeconds(_wave.delayBetweenEnemySpawns);
-
-            if (!_playerIsAlive) { yield break; }
-        }
-
-        _spawnState = SpawnState.WAITING;
-
-        yield break;
-    }
-
-    void SpawnEnemy(GameObject _enemyPrefab)
-    {
-        Debug.Log("Spawning Enemy: " + _enemyPrefab.name);
-        GameObject newEnemy = Instantiate(_enemyPrefab, new Vector3(0, 10, 0), Quaternion.identity);
-        newEnemy.transform.parent = _enemyContainer.transform;
-    }
 
     public void EnemyDeath()
     {
@@ -152,5 +180,32 @@ public class WaveSpawner : MonoBehaviour
     public void OnPlayerDeath()
     {
         _playerIsAlive = false;
+    }
+
+    public IEnumerator SpawnPowerUpRoutine()
+    {
+        //yield return new WaitForSeconds(_delayAfterAsteroidDestroyed + Random.Range(4.0f, 8.0f));
+        //_SpawnPowerups = true;
+        //Debug.Log("Spawning PowerUps: STARTED");
+        //SpawnCount++;
+
+        while (GameManager._playerIsAlive)
+        {
+
+            //Debug.Log("Spawning PowerUps: SPAWNING");
+            _waitTimeBetweenPowerUpSpawns = Random.Range(9.0f, 15.0f);
+            int _RNDPowerUp = Random.Range(0, _powerUpPrefabs.Length);
+
+            //Debug.Log("WaitBetweenPowerUpSpawns = " + _waitTimeBetweenPowerUpSpawns);
+            //Debug.Log("PowerUp = " + _powerUpPrefabs[_RNDPowerUp]);
+
+            // TODO: if Shield is active do not spawn another
+
+            GameObject newPowerUp = Instantiate(_powerUpPrefabs[_RNDPowerUp], new Vector3(Random.Range(-6, 6), Random.Range(7, 14), 0), Quaternion.identity);
+            newPowerUp.transform.parent = _powerUpContainer.transform;
+            yield return new WaitForSeconds(_waitTimeBetweenPowerUpSpawns);
+            //if (_StopOldPowerUpSpawnRoutine) yield return null;
+        }
+        //Debug.Log("Spawning PowerUps: STOPPED");
     }
 }

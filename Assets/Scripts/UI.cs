@@ -8,11 +8,11 @@ public class UI : MonoBehaviour
     public static UI instance;
 
     [SerializeField] Text _shipWrap;
-    [SerializeField] Text _livesText;
+    [SerializeField] Text _playerLives;
     [SerializeField] Text _gameOverText;
     [SerializeField] float BlinkTime;
-    [SerializeField] Text _enemiesText;
-    [SerializeField] Text _levelText;
+    [SerializeField] Text _enemiesRemaing;
+    [SerializeField] Text _currentLevel;
     [SerializeField] Text _waveName;
     [SerializeField] Text _waveIncomingText;
     [SerializeField] Text _waveIncomingSecondsText;
@@ -26,19 +26,22 @@ public class UI : MonoBehaviour
         instance = this;
     }
 
-    public void DisplayLives(int _lives)
+    public void DisplayLives(int _playerLivesRemaining)
     {
-        _livesText.text = _lives.ToString();
+        _playerLives.text = _playerLivesRemaining.ToString();
     }
 
     public void DisplayEnemies(int _remainingEnemies, int _totalEnemies)
     {
-        _enemiesText.text = _remainingEnemies.ToString() + "/" + _totalEnemies.ToString();
+        if (_enemiesRemaing != null)
+        {
+            _enemiesRemaing.text = _remainingEnemies + "/" + _totalEnemies;
+        }
     }
 
     public void DisplayLevel(int _level)
     {
-        _levelText.text = _level.ToString();
+        _currentLevel.text = _level.ToString();
     }
 
     public void DisplayShipWrapStatus()
