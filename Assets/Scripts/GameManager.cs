@@ -9,6 +9,8 @@ public class GameManager : MonoBehaviour
 
     public static bool _playerIsAlive;
 
+    public static bool _disablePowerUp_Spawning = false;
+
     private void Awake()
     {
         instance = this;

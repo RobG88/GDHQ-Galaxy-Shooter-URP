@@ -27,9 +27,15 @@ public class PowerUp : MonoBehaviour
     float _respawnYmin = 12.0f;
     float _respawnYmax = 15.0f;
 
+    /// <summary>
+    /// Testing: force Power-Up to drop where placed
+    /// </summary>
+    [SerializeField] bool CHEAT_LINE_THEM_UP = false;
+
     void Start()
     {
-        transform.position = RandomSpawnLocation();
+        if (!CHEAT_LINE_THEM_UP)
+            transform.position = RandomSpawnLocation();
     }
 
     void Update()
