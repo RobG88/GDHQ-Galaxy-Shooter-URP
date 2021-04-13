@@ -30,12 +30,12 @@ public class PowerUp : MonoBehaviour
     /// <summary>
     /// Testing: force Power-Up to drop where placed
     /// </summary>
-    [SerializeField] bool CHEAT_LINE_THEM_UP = false;
+    [SerializeField] bool CHEAT_LINE_THEM_UP = true;
 
     void Start()
     {
-        if (!CHEAT_LINE_THEM_UP)
-            transform.position = RandomSpawnLocation();
+        //if (!CHEAT_LINE_THEM_UP)
+            //transform.position = RandomSpawnLocation();
     }
 
     void Update()
@@ -80,6 +80,7 @@ public class PowerUp : MonoBehaviour
             if (player != null)
             {
                 //Player.instance.ActivateTripleshot();
+                //UI.instance.ActiveTripleShotUI();
                 Destroy(this.gameObject);
             }
         }

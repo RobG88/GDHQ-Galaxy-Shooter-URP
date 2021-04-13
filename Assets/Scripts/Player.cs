@@ -219,6 +219,7 @@ public class Player : MonoBehaviour
         switch (_powerUpType)
         {
             case "TripleShot":
+                UI.instance.ActiveTripleShotUI();
                 Activate_PowerUp_Tripleshot();
                 /*
                 _tripleShotActive = true;
@@ -230,6 +231,7 @@ public class Player : MonoBehaviour
                 */
                 break;
             case "Speed":
+                UI.instance.ActiveSpeedBoostUI();
                 Activate_PowerUp_SpeedBoost();
                 /*
                 // Enable PowerUpCountDownBar

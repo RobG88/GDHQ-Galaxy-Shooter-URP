@@ -17,6 +17,13 @@ public class UI : MonoBehaviour
     [SerializeField] Text _waveIncomingText;
     [SerializeField] Text _waveIncomingSecondsText;
 
+    [SerializeField] GameObject _PowerUp_Tripleshot;
+    [SerializeField] GameObject _PowerUp_SpeedBoost;
+
+    [SerializeField] Timer Timer_PowerUp_Tripleshot;
+    [SerializeField] Timer Timer_PowerUp_Speed;
+
+
     string textToBlink;
 
     bool CheatKeyEnabled;
@@ -24,6 +31,14 @@ public class UI : MonoBehaviour
     void Awake()
     {
         instance = this;
+    }
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.P))
+        {
+            ActiveTripleShotUI();
+        }
     }
 
     public void DisplayLives(int _playerLivesRemaining)
@@ -95,5 +110,40 @@ public class UI : MonoBehaviour
         _waveIncomingText.gameObject.SetActive(isEnabled);
         _waveIncomingSecondsText.gameObject.SetActive(isEnabled);
         _waveIncomingSecondsText.text = countdownTime.ToString();
+    }
+
+    public void ActiveTripleShotUI()
+    {
+        _PowerUp_Tripleshot.SetActive(true);
+        Activate_Tripleshot(5);
+    }
+
+    public void ActiveSpeedBoostUI()
+    {
+        _PowerUp_SpeedBoost.SetActive(true);
+        Activate_SpeedBoost(5);
+    }
+
+    void Activate_Tripleshot(int duration)
+    {
+        Timer_PowerUp_Tripleshot
+        .SetDuration(duration)
+        .OnEnd(() => _PowerUp_Tripleshot.SetActive(false))
+        .Begin();
+        Timer_PowerUp_Tripleshot.enabled = false;
+    }
+
+    public void Activate_SpeedBoost(int duration)
+    {
+        Timer_PowerUp_Speed
+        .SetDuration(duration)
+        .OnEnd(() => _PowerUp_SpeedBoost.SetActive(false))
+        .Begin();
+    }
+
+    public void ActivatePowerUp()
+    {
+        /// Similar to Player PowerUp Case & PowerUp String
+        /// Activating the PowerUp Counter should work the same
     }
 }

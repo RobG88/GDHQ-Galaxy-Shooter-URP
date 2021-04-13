@@ -144,3 +144,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   powerUpType: 2
   _speed: 4
+  CHEAT_LINE_THEM_UP: 0
