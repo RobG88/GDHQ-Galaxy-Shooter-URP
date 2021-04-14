@@ -19,9 +19,11 @@ public class UI : MonoBehaviour
 
     [SerializeField] GameObject _PowerUp_Tripleshot;
     [SerializeField] GameObject _PowerUp_SpeedBoost;
+    [SerializeField] GameObject _PowerUp_Shields;
 
     [SerializeField] Timer Timer_PowerUp_Tripleshot;
     [SerializeField] Timer Timer_PowerUp_Speed;
+    [SerializeField] Timer Timer_PowerUp_Shields;
 
 
     string textToBlink;
@@ -124,6 +126,12 @@ public class UI : MonoBehaviour
         Activate_SpeedBoost(5);
     }
 
+    public void ActiveShieldsUI()
+    {
+        _PowerUp_Shields.SetActive(true);
+        Activate_Shields(5);
+    }
+
     void Activate_Tripleshot(int duration)
     {
         Timer_PowerUp_Tripleshot
@@ -138,6 +146,14 @@ public class UI : MonoBehaviour
         Timer_PowerUp_Speed
         .SetDuration(duration)
         .OnEnd(() => _PowerUp_SpeedBoost.SetActive(false))
+        .Begin();
+    }
+
+    public void Activate_Shields(int duration)
+    {
+        Timer_PowerUp_Shields
+        .SetDuration(duration)
+        .OnEnd(() => _PowerUp_Shields.SetActive(false))
         .Begin();
     }
 

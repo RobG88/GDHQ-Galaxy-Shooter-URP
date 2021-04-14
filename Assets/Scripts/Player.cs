@@ -22,7 +22,10 @@ public class Player : MonoBehaviour
     [SerializeField] Transform _gunLeft, _gunRight, _gunCenter;
     [SerializeField] Vector3 _laserOffset = new Vector3(0, 1.20f, 0); // distance offset when spawning laser Y-direction
     [SerializeField] Vector3 _cannonOffset; // in the event that two lasers strike the same collider, then give one cannon a slightly elevated offset.
-    Animator anim;
+
+    Animator _anim;
+    SpriteRenderer _spriteRenderer;
+    BoxCollider2D _boxCollider2D;
 
     bool _wrapShip = false; // Q = toggle wrap
     float _xScreenClampRight = 18.75f;
@@ -30,15 +33,39 @@ public class Player : MonoBehaviour
     float _yScreenClampUpper = 0;
     float _yScreenClampLower = -7f; // offical game = -3.8f;
 
-    /// <summary>
-    /// PowerUp Variables
-    /// Tripleshot
+    /// 
+    /// POWERUP VARIABLES
+    /// 
+    /// TRIPLESHOT VARIABLES - END
+    /// 
     [SerializeField] bool _powerUp_Tripleshot;
     [SerializeField] GameObject _tripleshotPrefab;
+    /// 
+    /// TRIPLESHOT VARIABLES - END
+    /// 
 
-    /// Speed
+    /// 
+    /// SPEED VARIABLES
+    /// 
     bool _speedActive = false;
-    /// Shield
+    /// 
+    /// SPEED VARIABLES - END
+    /// 
+
+    /// 
+    /// SHIELD VARIABLES
+    /// 
+    [SerializeField] bool _shieldActive = false;
+    [SerializeField] GameObject _shield;
+    //[SerializeField] int _shieldPower;
+    //[SerializeField] int _shieldBonus;
+    //Vector3 _shieldOriginalSize;
+    PlayerShields _playerShield;
+    /// 
+    /// SHIELD VARIABLES - END
+    /// 
+    /// 
+    /// 
     /// LaserEnergy
     /// Repair
     /// Ultimate
@@ -55,7 +82,9 @@ public class Player : MonoBehaviour
     private void Awake()
     {
         instance = this;
-        anim = GetComponent<Animator>();
+        _anim = GetComponent<Animator>();
+        _spriteRenderer = GetComponent<SpriteRenderer>();
+        _boxCollider2D = GetComponent<BoxCollider2D>();
     }
 
     void Start()
@@ -68,6 +97,14 @@ public class Player : MonoBehaviour
         UI.instance.DisplayShipWrapStatus();
 
         _speed = _spaceshipSpeed; // initialize Ship/Player speed
+
+        ///
+        /// SHIELDS VARIABLES INITIALIZE
+        ///
+        //_shieldOriginalSize = _shield.transform.localScale;
+        ///
+        /// SHIELDS VARIABLES INITIALIZE - END
+        ///
     }
 
     void Update()
@@ -141,7 +178,7 @@ public class Player : MonoBehaviour
 
     public void FireLaserCanon()
     {
-        anim.SetBool("fire", false);
+        _anim.SetBool("fire", false);
         FireLaser();
     }
 
@@ -149,17 +186,28 @@ public class Player : MonoBehaviour
     {
         if (_cheat_GODMODE) return;
 
-        _playerLives--;
-        if (_playerLives == 0)
+        if (_shieldActive)
         {
-            PlayerDeath();
+            _playerShield.Damage();
         }
+        else
+        {
+            _playerLives--;
 
-        UI.instance.DisplayLives(_playerLives);
+            if (_playerLives == 0)
+            {
+                PlayerDeath();
+            }
+
+            UI.instance.DisplayLives(_playerLives);
+        }
     }
 
     void PlayerDeath()
     {
+        _spriteRenderer.enabled = false;
+        _boxCollider2D.enabled = false;
+
         GameManager.instance.OnPlayerDeath();
         isGameOver = true;
         UI.instance.GameOver(isGameOver);
@@ -169,16 +217,21 @@ public class Player : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.tag == "Enemy")
+        if (other.CompareTag("Enemy"))
         {
             Damage();
         }
 
-        if (other.tag == "PowerUp")
+        if (other.CompareTag("PowerUp"))
         {
+            if (_shieldActive) return;
+
             string PowerUpToActivate;
             PowerUpToActivate = other.transform.GetComponent<PowerUp>().PowerType().ToString();
             // TODO: Need to Handle Multiple PowerUps?
+            // TODO: Do not allow collecting Power-Ups when shield is enabled
+
+            Debug.Log("Collided with: " + PowerUpToActivate);
             ActivatePowerUp(PowerUpToActivate);
         }
     }
@@ -190,6 +243,7 @@ public class Player : MonoBehaviour
 
     IEnumerator ActivatePowerupTripleshot()
     {
+        UI.instance.ActiveTripleShotUI();
         _powerUp_Tripleshot = true;
         yield return new WaitForSeconds(5f);
         _powerUp_Tripleshot = false;
@@ -202,9 +256,33 @@ public class Player : MonoBehaviour
 
     IEnumerator ActivatePowerupSpeedBoost()
     {
+        UI.instance.ActiveSpeedBoostUI();
         _speedActive = true;
         yield return new WaitForSeconds(5f);
         _speedActive = false;
+    }
+
+    public void Activate_PowerUp_Shields()
+    {
+        _shieldActive = true;
+        //_shieldPower = 3;                                   // # of hits before shield is destroyed
+        //_shield.transform.localScale = _shieldOriginalSize; // reset shield graphic to initial size
+        _shield.SetActive(_shieldActive);                            // enable the Shield gameObject
+        _playerShield = gameObject.GetComponentInChildren<PlayerShields>();
+    }
+
+    public void ShieldsDestroyed()
+    {
+        _shieldActive = false;
+    }
+
+    IEnumerator ActivatePowerupShields()
+    {
+        UI.instance.ActiveShieldsUI();
+        _shieldActive = true;
+        yield return new WaitForSeconds(5f);
+        _shieldActive = false;
+        _shield.SetActive(false);
     }
 
     IEnumerator ActivePowerUp(int timer)
@@ -219,7 +297,7 @@ public class Player : MonoBehaviour
         switch (_powerUpType)
         {
             case "TripleShot":
-                UI.instance.ActiveTripleShotUI();
+
                 Activate_PowerUp_Tripleshot();
                 /*
                 _tripleShotActive = true;
@@ -231,7 +309,7 @@ public class Player : MonoBehaviour
                 */
                 break;
             case "Speed":
-                UI.instance.ActiveSpeedBoostUI();
+
                 Activate_PowerUp_SpeedBoost();
                 /*
                 // Enable PowerUpCountDownBar
@@ -239,43 +317,49 @@ public class Player : MonoBehaviour
                 StartCoroutine(PowerUpCoolDownRoutine(_speedCoolDown));
                 */
                 break;
+            /// 
+            /// SHIELD POWERUP
+            /// 
+            case "Shield":
+                Activate_PowerUp_Shields();
                 /*
-                    /// 
-                    /// SHIELD POWERUP
-                    /// 
-                    case "Shield":
-                        _shieldPower = 3; // # of hits before shield is destroyed
-                        _shield.transform.localScale = _shieldOriginalSize; // reset shield graphic to initial size
-                        _shieldActive = true;
-                        _shield.SetActive(true); // enable the Shield gameObject
-                        break;
-                    /// 
-                    /// SHIELD POWERUP - END
-                    /// 
-                    case "EnergyCell":
-                        LaserCannonsRefill(5);
-                        break;
-                    ///
-                    /// REPAIR 'Health' POWERUP
-                    /// 
-                    case "Repair":
-                        RepairShip();
-                        break;
-                    ///
-                    /// REPAIR 'Health' POWERUP - END
-                    /// 
+                _shieldActive = true;
+                _shieldPower = 3; // # of hits before shield is destroyed
+                _shield.transform.localScale = _shieldOriginalSize; // reset shield graphic to initial size
 
-                    ///
-                    /// FREEZE/EMP TORPEDO POWERUP
-                    /// 
-                    case "FreezeTorpedo":
-                        _freezeTorpedoLoaded = true;
-                        _freezeTorpedoSprite.SetActive(true);
-                        break;
-                        ///
-                        /// FREEZE/EMP TORPEDO POWERUP - END
-                        ///
+                _shield.SetActive(true); // enable the Shield gameObject
+                /*
+                   Activate_PowerUp_Shields();
                 */
+                break;
+                /// 
+                /// SHIELD POWERUP - END
+                /// 
+                /*
+                      case "EnergyCell":
+                          LaserCannonsRefill(5);
+                          break;
+                      ///
+                      /// REPAIR 'Health' POWERUP
+                      /// 
+                      case "Repair":
+                          RepairShip();
+                          break;
+                      ///
+                      /// REPAIR 'Health' POWERUP - END
+                      /// 
+
+                      ///
+                      /// FREEZE/EMP TORPEDO POWERUP
+                      /// 
+                      case "FreezeTorpedo":
+                          _freezeTorpedoLoaded = true;
+                          _freezeTorpedoSprite.SetActive(true);
+                          break;
+                          ///
+                          /// FREEZE/EMP TORPEDO POWERUP - END
+                          ///
+                  */
         }
     }
 

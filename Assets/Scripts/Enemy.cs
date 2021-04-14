@@ -10,9 +10,11 @@ public class Enemy : MonoBehaviour
     //[SerializeField] GameObject _enemyLaserPrefab;
 
     [SerializeField] GameObject _enemyInvaderExplosion;
+    [SerializeField] GameObject _sfx;
     [SerializeField] bool CHEAT_LINE_THEM_UP = false;
 
-    BoxCollider2D enemyCollider;
+    BoxCollider2D _enemyCollider;
+    SpriteRenderer _enemySprite;
 
     //float _fireRate = 3.0f;
     //float _canFire = -1.0f;
@@ -28,7 +30,8 @@ public class Enemy : MonoBehaviour
 
     void Awake()
     {
-        enemyCollider = GetComponent<BoxCollider2D>();
+        _enemyCollider = GetComponent<BoxCollider2D>();
+        _enemySprite = GetComponent<SpriteRenderer>();
     }
 
     void Start()
@@ -62,7 +65,7 @@ public class Enemy : MonoBehaviour
         if (CHEAT_LINE_THEM_UP)
         {
             _enemyPos.x = 0;  // testing, line enemy for two lasers intersecting collider}
-        } 
+        }
         _enemyPos.y = Random.Range(_respawnYmin, _respawnYmax);
         transform.position = _enemyPos;
     }
@@ -70,13 +73,22 @@ public class Enemy : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.CompareTag("Laser") || other.CompareTag("Player"))
+        if (other.CompareTag("Laser") || other.CompareTag("Player") || other.CompareTag("Shield"))
         {
-            enemyCollider.enabled = false; // disable collider so two lasers can not collider at the same time
+            _enemySprite.enabled = false;
+            Debug.Log("1st trigger = " + other.tag);
+            _enemyCollider.enabled = false; // disable collider so two lasers can not collider at the same time
 
-            Instantiate(_enemyInvaderExplosion, transform.position, Quaternion.identity);
-
-            Destroy(this.gameObject);
+            if (other.CompareTag("Shield"))
+            {
+                Debug.Log("Checking for Explosion type, collided wtih " + other.tag);
+                _sfx.SetActive(true);
+            }
+            else
+            {
+                Instantiate(_enemyInvaderExplosion, transform.position, Quaternion.identity);
+            }
+            Destroy(this.gameObject, 1f);
         }
     }
 

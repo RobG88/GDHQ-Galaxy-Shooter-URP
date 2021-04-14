@@ -17,6 +17,7 @@ public class PowerUp : MonoBehaviour
     public PowerUpType powerUpType;
 
     [SerializeField] float _speed = 4.0f;
+    [SerializeField] GameObject _sfx;
 
     float _destoryYAxisThreshold = -10.0f;
 
@@ -30,12 +31,12 @@ public class PowerUp : MonoBehaviour
     /// <summary>
     /// Testing: force Power-Up to drop where placed
     /// </summary>
-    [SerializeField] bool CHEAT_LINE_THEM_UP = true;
+    [SerializeField] bool CHEAT_LINE_THEM_UP = false;
 
     void Start()
     {
-        //if (!CHEAT_LINE_THEM_UP)
-            //transform.position = RandomSpawnLocation();
+        if (!CHEAT_LINE_THEM_UP)
+            transform.position = RandomSpawnLocation();
     }
 
     void Update()
@@ -79,10 +80,15 @@ public class PowerUp : MonoBehaviour
             Player player = other.transform.GetComponent<Player>();
             if (player != null)
             {
-                //Player.instance.ActivateTripleshot();
-                //UI.instance.ActiveTripleShotUI();
                 Destroy(this.gameObject);
             }
+        }
+
+        if (other.CompareTag("Shield"))
+        {
+            _sfx.SetActive(true);
+            //Instantiate(_sfx, transform.position, Quaternion.identity);
+            Destroy(this.gameObject, .15f);
         }
     }
 

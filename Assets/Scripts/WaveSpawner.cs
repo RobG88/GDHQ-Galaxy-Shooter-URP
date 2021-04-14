@@ -114,7 +114,7 @@ public class WaveSpawner : MonoBehaviour
 
     void SpawnEnemy(GameObject _enemyPrefab)
     {
-        Debug.Log("Spawning Enemy: " + _enemyPrefab.name);
+        //Debug.Log("Spawning Enemy: " + _enemyPrefab.name);
         GameObject newEnemy = Instantiate(_enemyPrefab, new Vector3(0, 10, 0), Quaternion.identity);
         newEnemy.transform.parent = _enemyContainer.transform;
     }
