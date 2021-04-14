@@ -9,6 +9,7 @@ public class Enemy : MonoBehaviour
     //[SerializeField] float _enemyLaser = 6.0f;  // speed of enemy's laser
     //[SerializeField] GameObject _enemyLaserPrefab;
 
+    [SerializeField] int _scoreValue = 0;
     [SerializeField] GameObject _enemyInvaderExplosion;
     [SerializeField] GameObject _sfx;
     [SerializeField] bool CHEAT_LINE_THEM_UP = false;
@@ -76,24 +77,24 @@ public class Enemy : MonoBehaviour
         if (other.CompareTag("Laser") || other.CompareTag("Player") || other.CompareTag("Shield"))
         {
             _enemySprite.enabled = false;
-            Debug.Log("1st trigger = " + other.tag);
             _enemyCollider.enabled = false; // disable collider so two lasers can not collider at the same time
 
             if (other.CompareTag("Shield"))
             {
-                Debug.Log("Checking for Explosion type, collided wtih " + other.tag);
                 _sfx.SetActive(true);
             }
             else
             {
                 Instantiate(_enemyInvaderExplosion, transform.position, Quaternion.identity);
             }
-            Destroy(this.gameObject, 1f);
+
+            Destroy(this.gameObject, .15f);
         }
     }
 
     void OnDestroy()
     {
+        Player.instance.AddScore(_scoreValue);
         WaveSpawner.instance.EnemyDeath();
     }
 }

@@ -7,6 +7,7 @@ public class UI : MonoBehaviour
 {
     public static UI instance;
 
+    [SerializeField] Text _scoreText;
     [SerializeField] Text _shipWrap;
     [SerializeField] Text _playerLives;
     [SerializeField] Text _gameOverText;
@@ -35,11 +36,24 @@ public class UI : MonoBehaviour
         instance = this;
     }
 
+    void Start()
+    {
+        _scoreText.text = "---";
+    }
+
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.P))
         {
             ActiveTripleShotUI();
+        }
+    }
+
+    public void UpdateScore(int playerScore)
+    {
+        if (_scoreText != null)
+        {
+            _scoreText.text = playerScore.ToString("#,#");
         }
     }
 

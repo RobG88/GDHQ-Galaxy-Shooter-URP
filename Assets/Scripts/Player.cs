@@ -11,6 +11,8 @@ public class Player : MonoBehaviour
     [SerializeField] float _spaceshipSpeed = 15.0f;  // player/ship BASE CONSTANT speed
                                                      // speed lost for damage
 
+    int _score = 0;
+
     bool _enableMainThrusters;
 
     bool isGameOver = false;
@@ -125,6 +127,8 @@ public class Player : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Q)) { _wrapShip = !_wrapShip; UI.instance.SetCheatKey(_wrapShip); UI.instance.DisplayShipWrapStatus(); }
         if (Input.GetKeyDown(KeyCode.G)) { _cheat_GODMODE = !_cheat_GODMODE; }
         if (Input.GetKeyDown(KeyCode.T)) { _cheat_TRIPLE = !_cheat_TRIPLE; _powerUp_Tripleshot = _cheat_TRIPLE; }
+
+        if (Input.GetKeyDown(KeyCode.X) && _shieldActive) { DropShield(); }
         CalculateMovement();
     }
 
@@ -228,10 +232,10 @@ public class Player : MonoBehaviour
 
             string PowerUpToActivate;
             PowerUpToActivate = other.transform.GetComponent<PowerUp>().PowerType().ToString();
+
             // TODO: Need to Handle Multiple PowerUps?
             // TODO: Do not allow collecting Power-Ups when shield is enabled
 
-            Debug.Log("Collided with: " + PowerUpToActivate);
             ActivatePowerUp(PowerUpToActivate);
         }
     }
@@ -392,5 +396,17 @@ public class Player : MonoBehaviour
         /// THRUSTERS - SPEED CALC - END
         /// 
         return _newSpeed;
+    }
+
+
+    public void AddScore(int scoreAmount) // Update score, send to UI
+    {
+        _score += scoreAmount;
+        UI.instance.UpdateScore(_score);
+    }
+
+    void DropShield() {
+        _shieldActive = false;
+        _shield.SetActive(false);
     }
 }

@@ -4,8 +4,6 @@ using UnityEngine;
 
 public class PlayerShields : MonoBehaviour
 {
-    [SerializeField] SpriteRenderer _shieldOuterGlow;
-
     /// 
     /// SHIELD VARIABLES
     /// Inner Hex Color = 6200FF
@@ -15,23 +13,15 @@ public class PlayerShields : MonoBehaviour
     [SerializeField] GameObject _shield;
     [SerializeField] int _shieldPower;
     [SerializeField] int _shieldBonus;
-    Vector3 _shieldOriginalSize;
-    [SerializeField] bool _glow = false;
     /// 
     /// SHIELD VARIABLES - END
     /// 
 
-
-    void Start()
+    private void OnEnable()
     {
-        ///
-        /// SHIELDS VARIABLES INITIALIZE
-        ///
-        _shieldOriginalSize = _shield.transform.localScale;
+        _shield.transform.localScale = new Vector3(1, 1, 1);
         _shieldPower = 3;
-        ///
-        /// SHIELDS VARIABLES INITIALIZE - END
-        ///
+        _shieldActive = true;
     }
 
     public void Damage()
@@ -49,45 +39,9 @@ public class PlayerShields : MonoBehaviour
             {
                 _shieldActive = false;
                 Player.instance.ShieldsDestroyed();
-                _shieldPower = 3; // reset Shield 'hits' remain value
-                _shield.transform.localScale = _shieldOriginalSize;
                 _shield.SetActive(false);
             }
         }
-    }
-
-    IEnumerator FadeTo(float aValue, float aTime)
-    {
-        Debug.Log("FadeTo: Starting");
-        //float alpha = transform.renderer.material.color.a;
-        float alpha = _shieldOuterGlow.material.color.a;
-        for (float t = 0.0f; t < 1.0f; t += Time.deltaTime / aTime)
-        {
-            Color newColor = new Color(1f, 1f, 1f, Mathf.Lerp(alpha, aValue, t));
-            //_shieldOuterGlow.color = new Color(1f, 1f, 1f, Mathf.Lerp(min, max, amount));
-            //transform.renderer.material.color = newColor;
-            _shieldOuterGlow.material.color = newColor;
-
-            yield return null;
-            //yield return null;
-        }
-        _glow = !_glow;
-        Debug.Log("FadeTo: Ended");
-    }
-
-    IEnumerator ShieldsActivate()
-    {
-        while (_shieldActive)
-        {
-            StartCoroutine(FadeTo(0.75f, 0.50f));
-            _shield.transform.localScale -= new Vector3(0.5f, 0.5f, 0.5f);
-            yield return new WaitForSeconds(1f);
-            StartCoroutine(FadeTo(1.0f, 0.05f));
-            _shield.transform.localScale = _shieldOriginalSize;
-            yield return new WaitForSeconds(1f);
-
-        }
-        yield return null;
     }
 
     /*

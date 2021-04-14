@@ -146,7 +146,7 @@ MonoBehaviour:
   powerUpType: 0
   _speed: 4
   _sfx: {fileID: 1870738502688165052}
-  CHEAT_LINE_THEM_UP: 1
+  CHEAT_LINE_THEM_UP: 0
 --- !u!1001 &8370028283721499479
 PrefabInstance:
   m_ObjectHideFlags: 0
