@@ -8,6 +8,8 @@ public class UI : MonoBehaviour
     public static UI instance;
 
     [SerializeField] Text _scoreText;
+    [SerializeField] Image _livesRemainingImage;
+    [SerializeField] Sprite[] _livesSprites;
     [SerializeField] Text _shipWrap;
     [SerializeField] Text _playerLives;
     [SerializeField] Text _gameOverText;
@@ -17,6 +19,7 @@ public class UI : MonoBehaviour
     [SerializeField] Text _waveName;
     [SerializeField] Text _waveIncomingText;
     [SerializeField] Text _waveIncomingSecondsText;
+    [SerializeField] Text _restartGameText;
 
     [SerializeField] GameObject _PowerUp_Tripleshot;
     [SerializeField] GameObject _PowerUp_SpeedBoost;
@@ -39,6 +42,8 @@ public class UI : MonoBehaviour
     void Start()
     {
         _scoreText.text = "---";
+        _gameOverText.gameObject.SetActive(false);
+        _restartGameText.gameObject.SetActive(false);
     }
 
     private void Update()
@@ -59,6 +64,7 @@ public class UI : MonoBehaviour
 
     public void DisplayLives(int _playerLivesRemaining)
     {
+        _livesRemainingImage.sprite = _livesSprites[_playerLivesRemaining];
         _playerLives.text = _playerLivesRemaining.ToString();
     }
 
@@ -106,11 +112,6 @@ public class UI : MonoBehaviour
     public void SetCheatKey(bool status)
     {
         CheatKeyEnabled = status;
-    }
-
-    public void GameOver(bool isGameOVer)
-    {
-        _gameOverText.gameObject.SetActive(isGameOVer);
     }
 
     public void WaveCountdown(int Timer)
@@ -175,5 +176,39 @@ public class UI : MonoBehaviour
     {
         /// Similar to Player PowerUp Case & PowerUp String
         /// Activating the PowerUp Counter should work the same
+    }
+
+    public void GameOver(bool isGameOVer)
+    {
+        _gameOverText.gameObject.SetActive(isGameOVer);
+        //_gameOverText.gameObject.SetActive(true);
+        _restartGameText.gameObject.SetActive(isGameOVer);
+        StartCoroutine(GameOverColorChange());
+    }
+    public void DisplayGameOver()
+    {
+        _gameOverText.gameObject.SetActive(true);
+        _restartGameText.gameObject.SetActive(true);
+        StartCoroutine(GameOverColorChange());
+    }
+
+    IEnumerator GameOverColorChange()
+    {
+        var gameoverText = _gameOverText.GetComponent<Text>();
+
+        for (int i = 60; i >= 0; i--)
+        {
+            gameoverText.color = Color.red;
+            if (i % 2 == 0)
+            {
+                gameoverText.color = Color.blue;
+            }
+            if (i % 3 == 0)
+            {
+                gameoverText.color = Color.white;
+            }
+            yield return new WaitForSeconds(.1f);
+        }
+        gameoverText.color = Color.red;
     }
 }

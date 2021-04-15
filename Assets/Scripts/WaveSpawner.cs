@@ -31,10 +31,13 @@ public class WaveSpawner : MonoBehaviour
     [SerializeField] GameObject _powerUpContainer;
     float _waitTimeBetweenPowerUpSpawns;
     [SerializeField]float _spawnNextPowerup = -1.0f;  // game time value, tracking when a powerup can be spawned
+
+
     float _spawnPowerRate; // random time between min & max;
 
 
     float _delayAfterAsteroidDestroyed = 2.5f;
+
 
     bool _playerIsAlive = true;  // as long as playerIsAlive keep spawning current wave
     bool _beginCountdown = true;
