@@ -32,5 +32,9 @@ public class MainMenu : MonoBehaviour
         yield return new WaitForSeconds(.5f);
 
         GDHQSheild.SetActive(true);
+
+        yield return new WaitForSeconds(.5f);
+
+        NewGameButton.SetActive(true);
     }
 }
