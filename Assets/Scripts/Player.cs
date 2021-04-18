@@ -13,6 +13,24 @@ public class Player : MonoBehaviour
 
     int _score = 0;
 
+    [SerializeField] GameObject _thruster_left;
+    [SerializeField] GameObject _thruster_right;
+    [SerializeField] GameObject _thrusters;
+
+    Vector3 _originalThrustersLocalScale;
+    Vector3 _leftThrusterOriginalPos;
+    Vector3 _rightThrusterOriginalPos;
+    Vector3 ThrusterOffset = new Vector3(0, -0.5f, 0);
+    Vector3 _newLeft;
+    Vector3 _newRight;
+
+    [SerializeField] GameObject _shipDamageLeft;
+    [SerializeField] GameObject _shipDamageRight;
+    bool _damagedLeft = false;
+    bool _damagedRight = false;
+    Animator _animShipDamageLeft;
+    Animator _animShipDamageRight;
+
     bool _enableMainThrusters;
 
     bool isGameOver = false;
@@ -22,8 +40,6 @@ public class Player : MonoBehaviour
 
     [SerializeField] GameObject _laserPrefab;
     [SerializeField] Transform _gunLeft, _gunRight, _gunCenter;
-    [SerializeField] Vector3 _laserOffset = new Vector3(0, 1.20f, 0); // distance offset when spawning laser Y-direction
-    [SerializeField] Vector3 _cannonOffset; // in the event that two lasers strike the same collider, then give one cannon a slightly elevated offset.
 
     Animator _anim;
     SpriteRenderer _spriteRenderer;
@@ -93,12 +109,20 @@ public class Player : MonoBehaviour
     {
         _playerLives = 3;
         isGameOver = false;
-        transform.position = new Vector3(0, -7, 0); // offical game (0, -3.5f, 0);
+        transform.position = new Vector3(0, -3, 0); // offical game (0, -3.5f, 0);
+        _originalThrustersLocalScale = _thruster_left.transform.localScale;
         ////transform.position = new Vector3(0.3834784f, -5, 0); // exactly fire two lasers into one enemy
         UI.instance.DisplayLives(_playerLives);
         UI.instance.DisplayShipWrapStatus();
 
         _speed = _spaceshipSpeed; // initialize Ship/Player speed
+
+        /// Thrusters Left & Right
+        /// 
+        _leftThrusterOriginalPos = _thruster_left.transform.localPosition;
+        _rightThrusterOriginalPos = _thruster_right.transform.localPosition;
+        _newLeft = _leftThrusterOriginalPos + ThrusterOffset;
+        _newRight = _rightThrusterOriginalPos + ThrusterOffset;
 
         ///
         /// SHIELDS VARIABLES INITIALIZE
@@ -107,6 +131,12 @@ public class Player : MonoBehaviour
         ///
         /// SHIELDS VARIABLES INITIALIZE - END
         ///
+    }
+
+    IEnumerator RepeatLerp(Vector3 a, Vector3 b, float time)
+    {
+
+        yield return null;
     }
 
     void Update()
@@ -140,6 +170,36 @@ public class Player : MonoBehaviour
         float verticalInput = Input.GetAxis("Vertical");
         Vector3 direction = new Vector3(horizontalInput, verticalInput, 0);
         transform.Translate(direction * _speed * Time.deltaTime);
+
+
+        ////////////////////////////////////////////////
+        /// Thrusters Left & Right (not MAIN THRUSTER)
+        // Use the verticalInput 'W' or UpArrow * 1.75 as Thruster localScale multiplier
+        float thruster_y = verticalInput * .75f;
+
+        if (verticalInput > 0.20f)
+        {
+            Debug.Log("Verticle Input = " + verticalInput);
+            // Reset Thrusters/Afterburners to originalLocalScale so when Afterburners 
+            // do not over extend graphically under Spaceship
+            _thruster_left.transform.localScale = _originalThrustersLocalScale;
+            _thruster_right.transform.localScale = _originalThrustersLocalScale;
+
+            Vector3 thrusters = new Vector3(_thruster_left.transform.localScale.x,
+                                            thruster_y,
+                                            _thruster_left.transform.localScale.z);
+
+            float _thrustersAnimation = Random.Range(1.25f, 1.50f);
+
+            _thruster_left.transform.localScale = thrusters * _thrustersAnimation;
+            _thruster_right.transform.localScale = thrusters * _thrustersAnimation;
+        }
+        else if (verticalInput < 0.20f) // if the verticalInput < .20 then 'flicker' thrusters
+        {
+            float _thrustersAnimation = Random.Range(1.25f, 1.50f);
+            _thruster_left.transform.localScale = _originalThrustersLocalScale * _thrustersAnimation;
+            _thruster_right.transform.localScale = _originalThrustersLocalScale * _thrustersAnimation;
+        }
 
         // Player Boundaries 
         // Clamp Ship's Y pos
@@ -405,7 +465,8 @@ public class Player : MonoBehaviour
         UI.instance.UpdateScore(_score);
     }
 
-    void DropShield() {
+    void DropShield()
+    {
         _shieldActive = false;
         _shield.SetActive(false);
     }

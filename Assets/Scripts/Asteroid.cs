@@ -35,14 +35,15 @@ public class Asteroid : MonoBehaviour
 
         if (AsteroidBehavior == AsteroidBehaviorType.Giant)
         {
-            //SetAsteroidAttributes();
-            transform.localScale = new Vector3(Random.Range(2.0f, 3f), Random.Range(1.75f, 2.65f));
+            ////SetAsteroidAttributes();
+            //transform.localScale = new Vector3(Random.Range(2.0f, 3f), Random.Range(1.75f, 2.65f));
+            transform.localScale = new Vector3(Random.Range(3.5f, 4f), Random.Range(2.75f, 4.65f));
         }
         else
         {
             _rotateSpeed = 0;// Random.Range(-4, 4);
             _speed = 0.10f;
-            transform.localScale = new Vector3(Random.Range(0.45f, 0.60f), Random.Range(0.4f, 0.65f));
+            transform.localScale = new Vector3(Random.Range(0.50f, 0.80f), Random.Range(0.50f, 0.80f));
             SetAsteroidAttributes();
 
         }
@@ -96,14 +97,15 @@ public class Asteroid : MonoBehaviour
 
     void Update()
     {
+        //transform.Translate(Vector3.down * _speed * Time.deltaTime);
         RotateAsteroid();
         EuclideanTorus();
     }
 
     void SetAsteroidAttributes()
     {
-        _rotateSpeed = Random.Range(-10, 11);
-        _speed = Random.Range(0.5f, 1.8f);//1,3);
+        _rotateSpeed = Random.Range(-17, 18);
+        _speed = Random.Range(0.75f, 1.75f);//1,3);
 
     }
 
@@ -121,6 +123,8 @@ public class Asteroid : MonoBehaviour
         float _anotherspeed = 1.0f;
         //pos.y = pos.y - Time.deltaTime * _anotherspeed;
         pos.y = pos.y - Time.deltaTime * _speed;
+
+        //transform.Translate(Vector3.down * _speed * Time.deltaTime);
 
         switch (AsteroidBehavior)
         {
@@ -152,8 +156,10 @@ public class Asteroid : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.CompareTag("Laser") && (AsteroidBehavior == AsteroidBehaviorType.Giant))
+        if (other.CompareTag("Laser") && AsteroidBehavior == AsteroidBehaviorType.Giant)
         {
+            _asteroidCollider2D.enabled = false;
+            _asteroidSprite.enabled = false;
             SpawnAsteroids();
             Destroyed();
             return;
@@ -204,13 +210,13 @@ public class Asteroid : MonoBehaviour
                     asteroid.GetComponent<Asteroid>().AsteroidBehavior = AsteroidBehaviorType.Sin;
                     break;
                 case 4:
-                    asteroid.GetComponent<Asteroid>().AsteroidBehavior = AsteroidBehaviorType.Sinh;
+                    asteroid.GetComponent<Asteroid>().AsteroidBehavior = AsteroidBehaviorType.Cos;
                     break;
                 case 5:
-                    asteroid.GetComponent<Asteroid>().AsteroidBehavior = AsteroidBehaviorType.Cosh;
+                    asteroid.GetComponent<Asteroid>().AsteroidBehavior = AsteroidBehaviorType.Sin;
                     break;
                 case 0:
-                    asteroid.GetComponent<Asteroid>().AsteroidBehavior = AsteroidBehaviorType.Sinh;
+                    asteroid.GetComponent<Asteroid>().AsteroidBehavior = AsteroidBehaviorType.Cos;
                     break;
             }
 

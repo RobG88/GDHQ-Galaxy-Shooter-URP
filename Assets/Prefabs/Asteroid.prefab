@@ -135,8 +135,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   AsteroidBehavior: 0
-  _rotateSpeed: 3
-  _speed: 0
+  _rotateSpeed: 5
+  _speed: 1
   _asteroid: {fileID: 2983256580404034407, guid: 299d0adfdd55b6141a67b34cf8f6f963, type: 3}
   _explosionFX: {fileID: 8711802648192960688, guid: 5be8257daf28dcc438fafc9ad6e83ac6, type: 3}
   _initialAsteroid: 0
