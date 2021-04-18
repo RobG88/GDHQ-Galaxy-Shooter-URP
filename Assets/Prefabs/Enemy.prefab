@@ -19,7 +19,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &5340881827729638191
 Transform:
   m_ObjectHideFlags: 0
@@ -145,7 +145,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 54d41c5f1d8390344b9dfa56dd0db530, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _enemySpeed: 4
+  _enemySpeed: 55
   _scoreValue: 10
   _enemyInvaderExplosion: {fileID: 7834325887832118455, guid: ccae19aef2571ea40b4db44836d00025, type: 3}
   _sfx: {fileID: 7916873638736224894}

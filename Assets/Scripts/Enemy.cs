@@ -76,6 +76,7 @@ public class Enemy : MonoBehaviour
     {
         if (other.CompareTag("Laser") || other.CompareTag("Player") || other.CompareTag("Shield"))
         {
+            _enemySpeed = 0;
             _enemySprite.enabled = false;
             _enemyCollider.enabled = false; // disable collider so two lasers can not collider at the same time
 
