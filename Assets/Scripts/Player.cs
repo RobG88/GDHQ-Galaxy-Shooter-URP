@@ -54,7 +54,7 @@ public class Player : MonoBehaviour
     /// 
     /// POWERUP VARIABLES
     /// 
-    /// TRIPLESHOT VARIABLES - END
+    /// TRIPLESHOT VARIABLES - BEGIN
     /// 
     [SerializeField] bool _powerUp_Tripleshot;
     [SerializeField] GameObject _tripleshotPrefab;
@@ -109,7 +109,7 @@ public class Player : MonoBehaviour
     {
         _playerLives = 3;
         isGameOver = false;
-        transform.position = new Vector3(0, -3, 0); // offical game (0, -3.5f, 0);
+        transform.position = new Vector3(0, -5, 0); // offical game (0, -3.5f, 0);
         _originalThrustersLocalScale = _thruster_left.transform.localScale;
         ////transform.position = new Vector3(0.3834784f, -5, 0); // exactly fire two lasers into one enemy
         UI.instance.DisplayLives(_playerLives);

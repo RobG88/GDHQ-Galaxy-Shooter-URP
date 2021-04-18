@@ -253,7 +253,10 @@ public class Asteroid : MonoBehaviour
 
     private void OnDestroy()
     {
-        WaveSpawner.instance.EnemyDeath();
+        if (AsteroidBehavior == AsteroidBehaviorType.Giant)
+        {
+            WaveSpawner.instance.EnemyDeath();
+        }
     }
 
     void EuclideanTorus()

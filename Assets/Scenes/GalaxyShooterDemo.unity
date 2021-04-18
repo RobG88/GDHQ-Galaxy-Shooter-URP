@@ -2260,9 +2260,7 @@ MonoBehaviour:
   _waveCountdown: 0
   _enemyContainer: {fileID: 1520733733}
   _powerUpPrefabs:
-  - {fileID: 7810662798046527754, guid: e9ca59404e9862b4195d40d6e8e62e49, type: 3}
   - {fileID: 6712368121349629788, guid: 035dba9f75201734e8cc4f7a9cab4ae8, type: 3}
-  - {fileID: 5647977108281404022, guid: 7f0d9e37f1e20854f8d7234628f825f1, type: 3}
   _powerUpContainer: {fileID: 1314596240}
   _spawnNextPowerup: -1
 --- !u!4 &1897445044

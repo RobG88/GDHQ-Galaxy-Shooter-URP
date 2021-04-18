@@ -36,7 +36,8 @@ public class WaveSpawner : MonoBehaviour
     float _spawnPowerRate; // random time between min & max;
 
 
-    float _delayAfterAsteroidDestroyed = 2.5f;
+    float _delayAfterWaveStarts = 3f; // delay SPAWNING of Power-Ups at the beginning of each wave
+                                        // allow other SPAWNed coroutines to finish
 
 
     bool _playerIsAlive = true;  // as long as playerIsAlive keep spawning current wave
@@ -173,7 +174,7 @@ public class WaveSpawner : MonoBehaviour
 
     public IEnumerator SpawnPowerUpRoutine()
     {
-        //yield return new WaitForSeconds(_delayAfterAsteroidDestroyed + Random.Range(4.0f, 8.0f));
+        yield return new WaitForSeconds(_delayAfterWaveStarts + Random.Range(4.0f, 8.0f));
 
         while (GameManager._playerIsAlive)
         {
