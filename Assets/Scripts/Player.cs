@@ -13,7 +13,12 @@ public class Player : MonoBehaviour
 
     int _score = 0;
 
-    [SerializeField] GameObject _thruster_left;
+    float horizontalInput, verticalInput;
+    Vector3 direction;
+    float thruster_y; // Variable to amplify the ship's thrusters during forward/up movement
+    float _thrustersAnimation; // Variable to amplify the thrusters animation 'flicker'
+
+[SerializeField] GameObject _thruster_left;
     [SerializeField] GameObject _thruster_right;
     [SerializeField] GameObject _thrusters;
 
@@ -75,13 +80,17 @@ public class Player : MonoBehaviour
     /// 
     [SerializeField] bool _shieldActive = false;
     [SerializeField] GameObject _shield;
-    //[SerializeField] int _shieldPower;
-    //[SerializeField] int _shieldBonus;
-    //Vector3 _shieldOriginalSize;
+    [SerializeField] int _shieldPower;
+    [SerializeField] int _shieldBonus;
+    Vector3 _shieldOriginalSize;
     PlayerShields _playerShield;
     /// 
     /// SHIELD VARIABLES - END
     /// 
+
+    [SerializeField] bool _bonusLife;
+    bool _bonusLifeOncePerLevel;
+
     /// 
     /// 
     /// LaserEnergy
@@ -118,11 +127,13 @@ public class Player : MonoBehaviour
         _speed = _spaceshipSpeed; // initialize Ship/Player speed
 
         /// Thrusters Left & Right
-        /// 
+        /// Thrusters Damage
         _leftThrusterOriginalPos = _thruster_left.transform.localPosition;
         _rightThrusterOriginalPos = _thruster_right.transform.localPosition;
         _newLeft = _leftThrusterOriginalPos + ThrusterOffset;
         _newRight = _rightThrusterOriginalPos + ThrusterOffset;
+        _animShipDamageLeft = _shipDamageLeft.GetComponent<Animator>();
+        _animShipDamageRight = _shipDamageRight.GetComponent<Animator>();
 
         ///
         /// SHIELDS VARIABLES INITIALIZE
@@ -166,37 +177,34 @@ public class Player : MonoBehaviour
     {
         _speed = CalculateShipSpeed();
 
-        float horizontalInput = Input.GetAxis("Horizontal");
-        float verticalInput = Input.GetAxis("Vertical");
-        Vector3 direction = new Vector3(horizontalInput, verticalInput, 0);
+        horizontalInput = Input.GetAxis("Horizontal");
+        verticalInput = Input.GetAxis("Vertical");
+        direction = new Vector3(horizontalInput, verticalInput, 0);
         transform.Translate(direction * _speed * Time.deltaTime);
 
 
         ////////////////////////////////////////////////
         /// Thrusters Left & Right (not MAIN THRUSTER)
         // Use the verticalInput 'W' or UpArrow * 1.75 as Thruster localScale multiplier
-        float thruster_y = verticalInput * .75f;
+        thruster_y = verticalInput * .6f;
 
         if (verticalInput > 0.20f)
         {
-            Debug.Log("Verticle Input = " + verticalInput);
-            // Reset Thrusters/Afterburners to originalLocalScale so when Afterburners 
-            // do not over extend graphically under Spaceship
+            // Reset Thrusters/Afterburners to originalLocalScale
             _thruster_left.transform.localScale = _originalThrustersLocalScale;
             _thruster_right.transform.localScale = _originalThrustersLocalScale;
 
             Vector3 thrusters = new Vector3(_thruster_left.transform.localScale.x,
-                                            thruster_y,
-                                            _thruster_left.transform.localScale.z);
+                                    thruster_y,
+                                    _thruster_left.transform.localScale.z);
 
-            float _thrustersAnimation = Random.Range(1.25f, 1.50f);
-
+            _thrustersAnimation = Random.Range(1.25f, 1.50f);
             _thruster_left.transform.localScale = thrusters * _thrustersAnimation;
             _thruster_right.transform.localScale = thrusters * _thrustersAnimation;
         }
         else if (verticalInput < 0.20f) // if the verticalInput < .20 then 'flicker' thrusters
         {
-            float _thrustersAnimation = Random.Range(1.25f, 1.50f);
+            _thrustersAnimation = Random.Range(1.25f, 1.50f);
             _thruster_left.transform.localScale = _originalThrustersLocalScale * _thrustersAnimation;
             _thruster_right.transform.localScale = _originalThrustersLocalScale * _thrustersAnimation;
         }
@@ -246,6 +254,7 @@ public class Player : MonoBehaviour
         FireLaser();
     }
 
+    /*
     void Damage()
     {
         if (_cheat_GODMODE) return;
@@ -266,6 +275,103 @@ public class Player : MonoBehaviour
             UI.instance.DisplayLives(_playerLives);
         }
     }
+    */
+
+    ///
+    /// SHIELDS - SHIP DAMAGE ROUTINE
+    /// 
+    public void Damage() // Ship & Shield damage
+    {
+        if (_shieldBonus == 3 && !_bonusLifeOncePerLevel) // Enable 3x Shield Bonus 'hit'
+        {
+            _bonusLife = true;
+            _shieldBonus = 0;
+            _bonusLifeOncePerLevel = true;
+        }
+
+        if (_shieldActive)
+        {
+            _playerShield.Damage();
+        }
+        else
+        {
+            if (_bonusLife)
+            {
+                //UIManager.Instance.UpdateShieldBonusUI(_shieldBonus);
+                _bonusLife = false;
+            }
+            else
+            {
+                _playerLives--;
+                if (_playerLives < 0) _playerLives = 0;
+                UI.instance.DisplayLives(_playerLives);
+                _bonusLifeOncePerLevel = true;
+                _shieldBonus = 0;
+                //UIManager.Instance.UpdateShieldBonusUI(_shieldBonus);
+
+                if (_playerLives == 0)
+                {
+                    //isGameOver = true;  Set in PlayerDeath() 
+                    PlayerDeath();
+                    ///
+                    /// CAMERA SHAKE done via CINEMACHINE
+                    /// 
+                    //CinemachineShake.Instance.ShakeCamera(16f, 4f);
+                    //PlayerDeathSequence();
+                    return;
+                }
+                ///
+                /// CAMERA SHAKE done via CINEMACHINE
+                /// 
+                //CinemachineShake.Instance.ShakeCamera(5f, 1f);
+                SpaceshipDamaged();
+            }
+        }
+    }
+    ///
+    /// SHIELDS - SHIP DAMAGE ROUTINE - END
+    /// 
+
+    void SpaceshipDamaged() // if player ship is hit, damage port or starboard
+    {
+        if (!_damagedLeft && !_damagedRight)
+        {
+            int RND_Damage = Random.Range(0, 2);
+            if (RND_Damage == 0)
+            {
+                SpaceshipDamagedLeft();
+            }
+            else if (RND_Damage == 1)
+            {
+                SpaceshipDamagedRight();
+            }
+        }
+        else if (_damagedLeft && !_damagedRight)
+        {
+            SpaceshipDamagedRight();
+        }
+        else if (!_damagedLeft && _damagedRight)
+        {
+            SpaceshipDamagedLeft();
+        }
+        //_sound.clip = _explosionSFX;
+        //_sound.PlayOneShot(_sound.clip);
+    }
+
+    private void SpaceshipDamagedLeft() // ship port side damage
+    {
+        _damagedLeft = true;
+        _shipDamageLeft.SetActive(true);
+        //_animShipDamageLeft.SetTrigger("PlayerDamageLeft");
+    }
+
+    private void SpaceshipDamagedRight() // ship starboard side damage
+    {
+        _damagedRight = true;
+        _shipDamageRight.SetActive(true);
+        //_animShipDamageRight.SetTrigger("PlayerDamageRight");
+    }
+
 
     void PlayerDeath()
     {
